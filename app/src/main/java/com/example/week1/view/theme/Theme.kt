@@ -1,4 +1,4 @@
-package com.example.week1.ui.theme
+package com.example.week1.view.theme
 
 import android.app.Activity
 import android.os.Build

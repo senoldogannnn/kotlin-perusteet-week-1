@@ -1,4 +1,4 @@
-package com.example.week1.domain
+package com.example.week1.model
 
 
 // Lisätään uus taski listaan

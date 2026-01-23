@@ -1,4 +1,4 @@
-package com.example.week1.ui.theme
+package com.example.week1.view.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
