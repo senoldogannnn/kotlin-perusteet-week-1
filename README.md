@@ -29,7 +29,7 @@ Ideana on jakaa koodi kolmeen osaan, et se pysyis siistinä ja ois helpompi test
 - Heti ku listaan tulee muutos ViewModelissa, UI piirtää ittesä uusiks automaattisesti. Ei tarvii mitään manuaalista säätöä.
 
 ## Ominaisuudet
-- **Lisää taski**: Kirota nimi ja kuvaus, paina nappia.
+- **Lisää taski**: Kirjoita nimi ja kuvaus, paina nappia.
 - **Muokkaa/Poista**: Klikkaa taskia ni aukee dialogi. Siellä voi editoia tekstejä tai heittää roskiin.
 - **Merkkaa tehdyks**: Checkboxilla voi ruksia homman valmiiks.
 - **Reaktiivinen UI**: Kaikki päivittyy heti ruudulle StateFlown ansiosta.
