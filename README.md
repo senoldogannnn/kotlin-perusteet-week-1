@@ -1,35 +1,35 @@
 # Mobiiliohjelmointi - Week 3: MVVM & Jetpack Compose
 
-This project demonstrates the **Model-View-ViewModel (MVVM)** architectural pattern using Jetpack Compose and StateFlow.
+Täs prokkiksessa harjoteltiin **Model-View-ViewModel (MVVM)** -arkkitehtuuria ja käytettiin Jetpack Composea sekä StateFlowta.
 
-## MVVM Architecture
-MVVM separates the application into three layers to improve maintainability and testability:
+## MVVM-arkkitehtuuri
+Ideana on jakaa koodi kolmeen osaan, et se pysyis siistinä ja ois helpompi testata:
 
 1.  **Model (`com.example.week1.model`)**:
-    - Represents the data and business logic.
-    - `Task.kt`: Data class defining the structure of a task.
-    - `TaskLogic.kt`: Helper functions for data manipulation.
+    - Tänne tulee kaikki data ja logiikka.
+    - `Task.kt`: Ihan perus dataclassi taskeille.
+    - `TaskLogic.kt`: Apufunktiot jos tarvii pyöritellä dataa.
 
 2.  **View (`com.example.week1.view`)**:
-    - Displays the UI and reacts to user actions.
-    - `HomeScreen.kt`: Main screen displaying the list of tasks.
-    - `DetailDialog.kt`: Dialog for editing or deleting a task.
-    - The View **observes** the ViewModel's state and updates automatically.
+    - Tää hoitaa vaan sen miltä appi näyttää.
+    - `HomeScreen.kt`: Päänäkymä missä listataan hommat.
+    - `DetailDialog.kt`: Ikkuna missä voi muokkaa tai poistaa taskin.
+    - View vaan **kuuntelee** ViewModelia ja päivittyy sen mukaan.
 
 3.  **ViewModel (`com.example.week1.viewmodel`)**:
-    - Acts as a bridge between Model and View.
-    - `TaskViewModel.kt`: Holds the UI state (`StateFlow`) and handles user intents (e.g., adding or removing tasks).
-    - Ensures the UI logic is separated from the UI components.
+    - Tää toimii siltana Modelin ja Viewin välissä.
+    - `TaskViewModel.kt`: Täällä pidetään yllä tilaa (`StateFlow`) ja hoidetaan käyttäjän toiminnot (esim. lisäys tai poisto).
+    - UI-logiikka pysyy täällä eikä sekoitu näyttöön.
 
 ## StateFlow
-**StateFlow** is a state-holder observable flow that emits the current and new state updates to its collectors.
+**StateFlow** on tapa hallita tilaa silleen modernisti.
 
-- In `TaskViewModel`, we expose a `StateFlow<List<Task>>` to the View.
-- The View uses `collectAsState()` to subscribe to updates.
-- When the list changes in the ViewModel, the UI automatically recomposes to reflect the new state.
+- `TaskViewModel` tarjoaa ulospäin `StateFlow<List<Task>>` -listan.
+- View sit "kollectaa" tätä (`collectAsState()`) ja kuuntelee muutoksia.
+- Heti ku listaan tulee muutos ViewModelissa, UI piirtää ittesä uusiks automaattisesti. Ei tarvii mitään manuaalista säätöä.
 
-## Features
-- **Add Task**: Create new tasks with a title and optional description.
-- **Edit/Delete**: Click on a task to open a dialog where you can edit its details or delete it.
- - **Toggle Done**: Checkbox to mark tasks as completed.
-- **Reactive UI**: Updates happen instantaneously thanks to StateFlow.
+## Ominaisuudet
+- **Lisää taski**: Kirota nimi ja kuvaus, paina nappia.
+- **Muokkaa/Poista**: Klikkaa taskia ni aukee dialogi. Siellä voi editoia tekstejä tai heittää roskiin.
+- **Merkkaa tehdyks**: Checkboxilla voi ruksia homman valmiiks.
+- **Reaktiivinen UI**: Kaikki päivittyy heti ruudulle StateFlown ansiosta.
