@@ -1,35 +1,24 @@
-# Mobiiliohjelmointi - Week 3: MVVM & Jetpack Compose
+# Mobiiliohjelmointi - Week 4: Jetpack Compose Navigation
 
-Täs prokkiksessa harjoteltiin **Model-View-ViewModel (MVVM)** -arkkitehtuuria ja käytettiin Jetpack Composea sekä StateFlowta.
+Tällä viikolla laajennettiin sovellusta lisäämällä kunnon navigaatio.
 
-## MVVM-arkkitehtuuri
-Ideana on jakaa koodi kolmeen osaan, et se pysyis siistinä ja ois helpompi testata:
+## Navigaatio & Arkkitehtuuri
+Nyt sovellus on "Single-Activity" -tyylinen, eli meillä on vaan `MainActivity`, joka pyörittää eri ruutuja `NavHostin` avulla.
 
-1.  **Model (`com.example.week1.model`)**:
-    - Tänne tulee kaikki data ja logiikka.
-    - `Task.kt`: Ihan perus dataclassi taskeille.
-    - `TaskLogic.kt`: Apufunktiot jos tarvii pyöritellä dataa.
+### Navigointi
+- **NavHost**: Tää on se "kontti", joka vaihtaa ruutua sen mukaan mitä linkkiä painetaan.
+- **NavController**: Tää hoitaa sen varsinaisen liikkumisen (`navigate("home")`, `navigate("calendar")`).
+- **BottomNavigation**: Alapalkki, josta pääsee vaihtaan näkymää (Tehtävät, Kalenteri, Asetukset).
 
-2.  **View (`com.example.week1.view`)**:
-    - Tää hoitaa vaan sen miltä appi näyttää.
-    - `HomeScreen.kt`: Päänäkymä missä listataan hommat.
-    - `DetailDialog.kt`: Ikkuna missä voi muokkaa tai poistaa taskin.
-    - View vaan **kuuntelee** ViewModelia ja päivittyy sen mukaan.
+### Jaettu Tila (Shared State)
+Mulla on yks ainoa `TaskViewModel`, joka luodaan `MainApp`:n sisällä. Se välitetään sieltä sekä `HomeScreen`:lle että `CalendarScreen`:lle.
+- Tän ansiosta jos lisäät taskin "Tehtävät"-sivulla, se näkyy **heti** myös "Kalenteri"-sivulla.
+- Molemmat näkymät kuuntelee samaa `StateFlowta`.
 
-3.  **ViewModel (`com.example.week1.viewmodel`)**:
-    - Tää toimii siltana Modelin ja Viewin välissä.
-    - `TaskViewModel.kt`: Täällä pidetään yllä tilaa (`StateFlow`) ja hoidetaan käyttäjän toiminnot (esim. lisäys tai poisto).
-    - UI-logiikka pysyy täällä eikä sekoitu näyttöön.
+## Uudet Näkymät
+1.  **HomeScreen**: Vanha tuttu lista.
+2.  **CalendarScreen**: Täällä tehtävät on ryhmitelty päivämäärän (`dueDate`) mukaan. Ihan vaan simppeli `LazyColumn`, jossa on otsikot päiville.
+3.  **SettingsScreen**: Tää on vielä dummy, tekstinä vaan et täs olis asetukset.
 
-## StateFlow
-**StateFlow** on tapa hallita tilaa silleen modernisti.
-
-- `TaskViewModel` tarjoaa ulospäin `StateFlow<List<Task>>` -listan.
-- View sit "kollectaa" tätä (`collectAsState()`) ja kuuntelee muutoksia.
-- Heti ku listaan tulee muutos ViewModelissa, UI piirtää ittesä uusiks automaattisesti. Ei tarvii mitään manuaalista säätöä.
-
-## Ominaisuudet
-- **Lisää taski**: Kirjoita nimi ja kuvaus, paina nappia.
-- **Muokkaa/Poista**: Klikkaa taskia ni aukee dialogi. Siellä voi editoia tekstejä tai heittää roskiin.
-- **Merkkaa tehdyks**: Checkboxilla voi ruksia homman valmiiks.
-- **Reaktiivinen UI**: Kaikki päivittyy heti ruudulle StateFlown ansiosta.
+## Dialogit
+Lisäys ja muokkaus hoidetaan `AlertDialog`:lla. Se ei oo oma "sivu" navigaatiossa, vaan se lävähtää siihen nykyisen ruudun päälle. Sama dialogi toimii sekä listassa että kalenterissa.
