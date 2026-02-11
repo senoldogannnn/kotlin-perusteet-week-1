@@ -1,6 +1,6 @@
 package com.example.week1.viewmodel
 
-import com.example.week1.model.WeatherResponse
+import com.example.week1.data.model.WeatherResponse
 
 sealed interface WeatherUiState {
     object Idle : WeatherUiState

@@ -1,6 +1,6 @@
-package com.example.week1.data
+package com.example.week1.data.remote
 
-import com.example.week1.model.WeatherResponse
+import com.example.week1.data.model.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

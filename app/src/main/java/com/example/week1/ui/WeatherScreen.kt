@@ -1,4 +1,4 @@
-package com.example.week1.view
+package com.example.week1.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -68,22 +68,7 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
                 CircularProgressIndicator()
             }
             is WeatherUiState.Success -> {
-                val weather = state.response
-                Text(
-                    text = weather.name,
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Text(
-                    text = "${weather.main.temp} °C",
-                    style = MaterialTheme.typography.displayMedium
-                )
-                Text(
-                    text = weather.weather.firstOrNull()?.description ?: "-",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Tuuli: ${weather.wind.speed} m/s")
-                Text("Ilmankosteus: ${weather.main.humidity} %")
+                WeatherResultSection(weather = state.response)
             }
             is WeatherUiState.Error -> {
                 Text(
