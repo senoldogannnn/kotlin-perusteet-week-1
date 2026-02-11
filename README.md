@@ -1,24 +1,27 @@
-# Mobiiliohjelmointi - Week 4: Jetpack Compose Navigation
+# Mobiiliohjelmointi - Week 5: Weather App (Retrofit + OpenWeather API)
 
-Tällä viikolla laajennettiin sovellusta lisäämällä kunnon navigaatio.
+Tällä viikolla rakennettiin sääsovellus, joka hakee dataa OpenWeatherMap API:sta.
 
-## Navigaatio & Arkkitehtuuri
-Nyt sovellus on "Single-Activity" -tyylinen, eli meillä on vaan `MainActivity`, joka pyörittää eri ruutuja `NavHostin` avulla.
+## Teknologiat & Ratkaisut
 
-### Navigointi
-- **NavHost**: Tää on se "kontti", joka vaihtaa ruutua sen mukaan mitä linkkiä painetaan.
-- **NavController**: Tää hoitaa sen varsinaisen liikkumisen (`navigate("home")`, `navigate("calendar")`).
-- **BottomNavigation**: Alapalkki, josta pääsee vaihtaan näkymää (Tehtävät, Kalenteri, Asetukset).
+### Retrofit & JSON
+- **Retrofit**: Hoitaa HTTP-pyynnöt verkkoon. Se luo `WeatherApi`-rajapinnan toteutuksen taustalla.
+- **Gson**: Toimii konvertterina, joka muuttaa API:sta tulevan JSON-vastauksen suoraan Kotlinin data-luokiksi (`WeatherResponse`).
 
-### Jaettu Tila (Shared State)
-Mulla on yks ainoa `TaskViewModel`, joka luodaan `MainApp`:n sisällä. Se välitetään sieltä sekä `HomeScreen`:lle että `CalendarScreen`:lle.
-- Tän ansiosta jos lisäät taskin "Tehtävät"-sivulla, se näkyy **heti** myös "Kalenteri"-sivulla.
-- Molemmat näkymät kuuntelee samaa `StateFlowta`.
+### Coroutines
+- API-haku tehdään `suspend`-funktiolla (`getWeather`).
+- Kutsu käynnistetään `ViewModel`issa `viewModelScope.launch` -blokissa. Tämä varmistaa, että verkkoliikenne tapahtuu taustasäikeessä (IO), eikä jumita käyttöliittymää (Main Thread).
 
-## Uudet Näkymät
-1.  **HomeScreen**: Vanha tuttu lista.
-2.  **CalendarScreen**: Täällä tehtävät on ryhmitelty päivämäärän (`dueDate`) mukaan. Ihan vaan simppeli `LazyColumn`, jossa on otsikot päiville.
-3.  **SettingsScreen**: Tää on vielä dummy, tekstinä vaan et täs olis asetukset.
+### UI Tila (State Management)
+- **ViewModel**: Pitää yllä sovelluksen tilaa (`WeatherUiState`).
+- `WeatherUiState` on `sealed interface`, jolla on kolme tilaa:
+    1.  `Idle`: Odottaa syötettä.
+    2.  `Loading`: Haku käynnissä (näytetään latausympyrä).
+    3.  `Success`: Data saapui (näytetään sää).
+    4.  `Error`: Jotain meni pieleen (näytetään virheviesti).
+- **Compose**: `WeatherScreen` kuuntelee tilaa (`collectAsState`) ja päivittää näkymän automaattisesti tilan muuttuessa.
 
-## Dialogit
-Lisäys ja muokkaus hoidetaan `AlertDialog`:lla. Se ei oo oma "sivu" navigaatiossa, vaan se lävähtää siihen nykyisen ruudun päälle. Sama dialogi toimii sekä listassa että kalenterissa.
+### API Key Turvallisuus
+- API-avainta **ei** ole kovakoodattu koodiin.
+- Se on tallennettu `local.properties` -tiedostoon, jota ei laiteta Gitiin.
+- Build-vaiheessa Gradle lukee sen ja luo `BuildConfig.OPEN_WEATHER_API_KEY` -vakion, jota koodi käyttää.

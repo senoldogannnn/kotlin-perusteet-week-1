@@ -13,6 +13,6 @@ fun SettingsScreen() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Asetukset (Tässä vois laittaa mm. teeman vaihdon)")
+        Text(text = "Asetukset")
     }
 }
