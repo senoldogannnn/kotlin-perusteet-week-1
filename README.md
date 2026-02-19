@@ -1,27 +1,24 @@
-# Mobiiliohjelmointi - Week 5: Weather App (Retrofit + OpenWeather API)
+# Mobiiliohjelmointi - Week 6: Room Database Integration (Weather App Caching)
 
-Tällä viikolla rakennettiin sääsovellus, joka hakee dataa OpenWeatherMap API:sta.
+Tällä viikolla sääsovellukseen lisättiin **Room**-tietokanta, joka toimii välimuistina (caching). Tämä vähentää verkkoliikennettä ja mahdollistaa sovelluksen käytön (osittain) ilman nettiyhteyttä.
 
-## Teknologiat & Ratkaisut
+## Arkkitehtuuri & Tietovirta
+Sovellus noudattaa Google suosittelemaa arkkitehtuuria:
+`UI` -> `ViewModel` -> `Repository` -> (`Local Database` + `Remote API`)
 
-### Retrofit & JSON
-- **Retrofit**: Hoitaa HTTP-pyynnöt verkkoon. Se luo `WeatherApi`-rajapinnan toteutuksen taustalla.
-- **Gson**: Toimii konvertterina, joka muuttaa API:sta tulevan JSON-vastauksen suoraan Kotlinin data-luokiksi (`WeatherResponse`).
+1.  **UI (WeatherScreen)**: Pyytää säätä ViewModelilta.
+2.  **ViewModel (WeatherViewModel)**: Välittää pyynnön Repositorylle.
+3.  **Repository (WeatherRepository)**: Päättää mistä data haetaan (Välimuisti vs Verkko).
+4.  **Local (Room)**: Tallentaa säätiedot pysyvästi laitteelle.
+5.  **Remote (Retrofit)**: Hakee tuoreimman sään OpenWeatherMap:sta.
 
-### Coroutines
-- API-haku tehdään `suspend`-funktiolla (`getWeather`).
-- Kutsu käynnistetään `ViewModel`issa `viewModelScope.launch` -blokissa. Tämä varmistaa, että verkkoliikenne tapahtuu taustasäikeessä (IO), eikä jumita käyttöliittymää (Main Thread).
+## Välimuistilogiikka (Caching Logic)
+Repository tarkistaa ensin onko kaupungin sää tallennettu tietokantaan.
+- **Jos data on tallella JA tuoretta (< 30 min vanhaa)**: Palautetaan data suoraan tietokannasta. API-kutsua ei tehdä.
+- **Jos data on vanhaa (> 30 min) TAI puuttuu**: Tehdään API-kutsu, tallennetaan uusi data tietokantaan ja palautetaan se käyttäjälle.
 
-### UI Tila (State Management)
-- **ViewModel**: Pitää yllä sovelluksen tilaa (`WeatherUiState`).
-- `WeatherUiState` on `sealed interface`, jolla on kolme tilaa:
-    1.  `Idle`: Odottaa syötettä.
-    2.  `Loading`: Haku käynnissä (näytetään latausympyrä).
-    3.  `Success`: Data saapui (näytetään sää).
-    4.  `Error`: Jotain meni pieleen (näytetään virheviesti).
-- **Compose**: `WeatherScreen` kuuntelee tilaa (`collectAsState`) ja päivittää näkymän automaattisesti tilan muuttuessa.
-
-### API Key Turvallisuus
-- API-avainta **ei** ole kovakoodattu koodiin.
-- Se on tallennettu `local.properties` -tiedostoon, jota ei laiteta Gitiin.
-- Build-vaiheessa Gradle lukee sen ja luo `BuildConfig.OPEN_WEATHER_API_KEY` -vakion, jota koodi käyttää.
+## Teknologiat
+- **Room**: SQL-tietokanta (Entity, DAO, Database).
+- **Retrofit + Gson**: Verkkoyhteydet.
+- **Coroutines & Flow**: Asynkroninen datankäsittely.
+- **ViewModel & LiveData/StateFlow**: UI:n tilanhallinta.
